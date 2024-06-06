@@ -35,12 +35,26 @@ type Blocks struct {
     Blocks []Block
 }
 
+type Counter struct {
+    Count int
+}
+
 func main() {
 	e := echo.New()
-    e.Renderer = NewTemplates()
     e.Use(middleware.Logger())
 
+    e.Renderer = NewTemplates()
+
+    count := Counter{Count: 0}
+
+    e.GET("/", func(c echo.Context) error {
+        count.Count++
+        return c.Render(http.StatusOK, "index", count)
+    });
+    
     e.GET("/blocks", func(c echo.Context) error {
+        count.Count++
+
         startStr := c.QueryParam("start")
         start, err := strconv.Atoi(startStr)
         if err != nil {
